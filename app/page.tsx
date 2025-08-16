@@ -1,103 +1,120 @@
-import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase-server";
+import AuthButton from "@/components/AuthButton";
+import Logo from "@/components/Logo";
+import { BookOpen, Sparkles, Download } from "lucide-react";
+import Footer from "@/components/Footer";
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+export default async function Home() {
+  let user = null;
+  
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const isSupabaseConfigured = supabaseUrl;
+  
+  if (isSupabaseConfigured) {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch (error) {
+      console.warn('Supabase not configured properly:', error);
+    }
+  }
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (<>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-blue-50">
+      {/* Header */}
+      <header className="p-6 flex justify-between items-center">
+        <Logo />
+        <AuthButton user={user} />
+      </header>
+
+      {/* Hero Section */}
+      <main className="container mx-auto px-6 py-12">
+        <div className="text-center mb-16">
+          <h2 className="text-6xl font-bold mb-6 text-black transform -rotate-1">
+            Create Magical
+            <br />
+            <span className="bg-yellow-300 px-4 py-2 inline-block transform rotate-1">
+              Picture Books
+            </span>
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto font-medium">
+            Transform your stories into beautiful, interactive picture books with AI-generated illustrations. 
+            Perfect for kids, teachers, and storytellers!
+          </p>
+          
+          <div className="flex gap-4 justify-center">
+            {user ? (
+              <Link href="/dashboard" className="neo-btn neo-primary text-lg">
+                Go to Dashboard
+              </Link>
+            ) : (
+              null
+            )}
+            <Link href="/books" className="neo-btn text-lg">
+              Browse Public Books
+            </Link>
+          </div>
         </div>
+
+        {/* Features */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="neo-card text-center transform rotate-1">
+            <Sparkles className="w-12 h-12 mx-auto mb-4 text-yellow-600" />
+            <h3 className="text-xl font-bold mb-2">AI-Generated Images</h3>
+            <p className="text-gray-700">
+              Bring your stories to life with beautiful AI-generated illustrations that match your narrative perfectly.
+            </p>
+          </div>
+          
+          <div className="neo-card text-center transform -rotate-1">
+            <BookOpen className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+            <h3 className="text-xl font-bold mb-2">Interactive Editor</h3>
+            <p className="text-gray-700">
+              Easy-to-use editor for creating and customizing your picture book pages with text and images.
+            </p>
+          </div>
+          
+          <div className="neo-card text-center transform rotate-1">
+            <Download className="w-12 h-12 mx-auto mb-4 text-green-600" />
+            <h3 className="text-xl font-bold mb-2">PDF Export</h3>
+            <p className="text-gray-700">
+              Download your finished picture book as a high-quality PDF for printing or sharing.
+            </p>
+          </div>
+        </div>
+
+        {/* How it Works
+        <div className="neo-card max-w-4xl mx-auto">
+          <h3 className="text-3xl font-bold text-center mb-8 transform -rotate-1">How It Works</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-xl font-bold mb-4 bg-yellow-200 px-4 py-2 inline-block transform rotate-1">
+                Option 1: From Text
+              </h4>
+              <ol className="list-decimal list-inside space-y-2 text-lg">
+                <li>Write or paste your story</li>
+                <li>AI breaks it into picture book pages</li>
+                <li>AI generates beautiful illustrations</li>
+                <li>Review, edit, and customize</li>
+              </ol>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold mb-4 bg-blue-200 px-4 py-2 inline-block transform -rotate-1">
+                Option 2: Blank Template
+              </h4>
+              <ol className="list-decimal list-inside space-y-2 text-lg">
+                <li>Start with blank pages</li>
+                <li>Add your own text and descriptions</li>
+                <li>Upload images or generate with AI</li>
+                <li>Arrange and customize layouts</li>
+              </ol>
+            </div>
+          </div>
+        </div> */}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+    <Footer />
+  </>);
 }
